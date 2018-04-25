@@ -6,6 +6,7 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.impl.GpioControllerImpl;
+import sky.program.Duration;
 
 public class RelayManager
 {
@@ -49,12 +50,12 @@ public class RelayManager
                 Logger.LOGGER.error("Error when opening the pin 2 ("+e.toString()+")");
                 try
                 {
-                    Thread.sleep(Time.get(500).millisecond());
+                    Thread.sleep(Duration.of(500).millisecond());
                     gpio.shutdown();
                     gpio=null;
                     Runtime.getRuntime().gc();
                     gpio=new GpioControllerImpl();
-                    Thread.sleep(Time.get(500).millisecond());
+                    Thread.sleep(Duration.of(500).millisecond());
                 }
                 catch(InterruptedException ex)
                 {

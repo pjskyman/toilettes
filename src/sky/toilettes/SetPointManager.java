@@ -14,6 +14,7 @@ import java.util.List;
 import sky.netatmo.NetatmoException;
 import sky.netatmo.Token;
 import sky.netatmo.TokenExpiredException;
+import sky.program.Duration;
 
 public class SetPointManager
 {
@@ -23,7 +24,7 @@ public class SetPointManager
     private static String dataMode="N/A";
     private static double manualSetPoint=0d;
     private static final List<Schedule> SCHEDULES=new ArrayList<>(2);
-    private static final long NETATMO_VERIFICATION_DELAY=Time.get(10).minute();
+    private static final long NETATMO_VERIFICATION_DELAY=Duration.of(10).minute();
 
     public static synchronized double getCurrentSetPoint()
     {

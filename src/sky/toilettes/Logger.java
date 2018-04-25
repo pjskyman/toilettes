@@ -14,6 +14,7 @@ import org.apache.log4j.Level;
 import org.apache.log4j.TTCCLayout;
 import org.apache.log4j.helpers.DateTimeDateFormat;
 import org.apache.log4j.spi.LoggingEvent;
+import sky.program.Duration;
 
 public final class Logger
 {
@@ -71,7 +72,7 @@ public final class Logger
             for(File logFile:logFiles)
             {
                 long modified=logFile.lastModified();
-                if(modified!=0L&&now-modified>Time.get(30).day())
+                if(modified!=0L&&now-modified>Duration.of(30).day())
                 {
                     logFile.delete();
                     count++;

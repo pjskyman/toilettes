@@ -16,12 +16,13 @@ import java.util.List;
 import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import sky.program.Duration;
 
 public class Toilettes
 {
     private static long lastPricingPeriodVerificationTime=0L;
     private static PricingPeriod currentPricingPeriod=PricingPeriod.UNKNOWN;
-    private static final long PRICING_PERIOD_VERIFICATION_DELAY=Time.get(5).second();
+    private static final long PRICING_PERIOD_VERIFICATION_DELAY=Duration.of(5).second();
     protected static final HeaterThread HEATER_THREAD=new HeaterThread();//protected pour accès dans FourLetterPhatManager
     private static final Map<PricingPeriod,Double> SETPOINT_OFFSETS;
     private static final Queue<Temperature> TEMPERATURES;
@@ -72,7 +73,7 @@ public class Toilettes
                         HEATER_THREAD.start();
                         started=true;
                     }
-                    Thread.sleep(Time.get(1).second());
+                    Thread.sleep(Duration.of(1).second());
                 }
                 catch(InterruptedException e)
                 {
@@ -81,7 +82,7 @@ public class Toilettes
                 catch(Exception e)
                 {
                     Logger.LOGGER.error("Error in main loop ("+e.toString()+")");
-                    Thread.sleep(Time.get(1).second());
+                    Thread.sleep(Duration.of(1).second());
                 }
         }
         catch(InterruptedException e)
@@ -96,7 +97,7 @@ public class Toilettes
         {
             try
             {
-                Thread.sleep(Time.get(100).millisecond());
+                Thread.sleep(Duration.of(100).millisecond());
             }
             catch(InterruptedException e)
             {
@@ -320,7 +321,7 @@ public class Toilettes
             while(true)
                 try
                 {
-                    Thread.sleep(Time.get(100).millisecond());
+                    Thread.sleep(Duration.of(100).millisecond());
                     while(!TEMPERATURES.isEmpty())
                     {
                         Temperature temperature=TEMPERATURES.peek();
@@ -335,7 +336,7 @@ public class Toilettes
                         else
                         {
                             Logger.LOGGER.info("\tProblème à l'ajout en base de données d'une mesure (taille="+TEMPERATURES.size()+") ["+totalTime+" ms]");
-                            Thread.sleep(Time.get(100).millisecond());
+                            Thread.sleep(Duration.of(100).millisecond());
                         }
                     }
                 }

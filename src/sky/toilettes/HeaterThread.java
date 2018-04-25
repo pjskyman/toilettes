@@ -1,6 +1,7 @@
 package sky.toilettes;
 
 import java.util.Queue;
+import sky.program.Duration;
 
 public class HeaterThread extends Thread
 {
@@ -9,8 +10,8 @@ public class HeaterThread extends Thread
     private boolean currentStatus;
     private boolean cycleInterrupted;
     private static long lastMeasureTime=0L;
-    private static final long CYCLE_TIME=Time.get(10).minute();
-    private static final long MINIMAL_STATE_TIME=Time.get(10).second();
+    private static final long CYCLE_TIME=Duration.of(10).minute();
+    private static final long MINIMAL_STATE_TIME=Duration.of(10).second();
     private static final Object LOCK_OBJECT=new Object();
     private static final double FULL_RATIO_TEMPERATURE_OFFSET=-.5d;
 
@@ -29,7 +30,7 @@ public class HeaterThread extends Thread
             ratio=Math.sqrt(ratio);
         Logger.LOGGER.info("Temperature="+temperature+"°C, set point="+setPoint+"°C, ratio="+ratio);
         long now=System.currentTimeMillis();
-        if(now-lastMeasureTime>Time.get(5).second())
+        if(now-lastMeasureTime>Duration.of(5).second())
         {
             temperatureQueue.offer(new Temperature(now,temperature,setPoint,Math.max(0d,ratio),heaterOn));
 //            Logger.LOGGER.info("Mise en file d'une nouvelle mesure (taille="+temperatureQueue.size()+")");
@@ -117,7 +118,7 @@ public class HeaterThread extends Thread
                 if(cycleInterrupted)
                     break;
             }
-            Thread.sleep(Time.get(100).millisecond());
+            Thread.sleep(Duration.of(100).millisecond());
         }
         synchronized(LOCK_OBJECT)
         {

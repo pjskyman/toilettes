@@ -4,6 +4,8 @@ import com.pi4j.io.i2c.I2CDevice;
 import java.io.IOException;
 import java.text.DecimalFormat;
 import java.text.NumberFormat;
+import java.util.Calendar;
+import java.util.GregorianCalendar;
 
 public class FourLetterPhatManager extends AbstractI2CManager
 {
@@ -105,6 +107,17 @@ public class FourLetterPhatManager extends AbstractI2CManager
         {
             Logger.LOGGER.error("Unable to format the temperature "+temperature+" ("+e.toString()+")");
         }
+    }
+
+    public static void printCurrentTime()
+    {
+        GregorianCalendar calendar=new GregorianCalendar();
+        int hour=calendar.get(Calendar.HOUR_OF_DAY);
+        int minute=calendar.get(Calendar.MINUTE);
+        if(hour<10)
+            print(SPACE,getDataDP(hour),getData(minute/10),getData(minute%10));
+        else
+            print(getData(hour/10),getDataDP(hour%10),getData(minute/10),getData(minute%10));
     }
 
     public static void printSetPoint(double setPoint)

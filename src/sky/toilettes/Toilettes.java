@@ -35,10 +35,10 @@ public class Toilettes
         DATABASE_POPULATOR.start();
         SETPOINT_OFFSETS=new HashMap<>();
         SETPOINT_OFFSETS.put(PricingPeriod.BLUE_DAY_OFF_PEAK_HOUR,Double.valueOf(0d));
-        SETPOINT_OFFSETS.put(PricingPeriod.BLUE_DAY_PEAK_HOUR,Double.valueOf(-.6d));
-        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_OFF_PEAK_HOUR,Double.valueOf(-.7d));
-        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_PEAK_HOUR,Double.valueOf(-1.6d));
-        SETPOINT_OFFSETS.put(PricingPeriod.RED_DAY_OFF_PEAK_HOUR,Double.valueOf(-2d));
+        SETPOINT_OFFSETS.put(PricingPeriod.BLUE_DAY_PEAK_HOUR,Double.valueOf(-.7930d));
+        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_OFF_PEAK_HOUR,Double.valueOf(-.5322d));
+        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_PEAK_HOUR,Double.valueOf(-1.5876d));
+        SETPOINT_OFFSETS.put(PricingPeriod.RED_DAY_OFF_PEAK_HOUR,Double.valueOf(-.7718d));
         SETPOINT_OFFSETS.put(PricingPeriod.RED_DAY_PEAK_HOUR,Double.valueOf(-5d));
         SETPOINT_OFFSETS.put(PricingPeriod.UNKNOWN,Double.valueOf(-10d));
     }
@@ -60,13 +60,16 @@ public class Toilettes
                     }
                     double temperature=ThermometerManager.getTemperature();
                     double correctedSetPoint=Math.max(0d,SetPointManager.getCurrentSetPoint()+SETPOINT_OFFSETS.get(currentPricingPeriod).doubleValue());
-                    if(++count%5==3)
+                    if(++count%6==3)
                         FourLetterPhatManager.printSetPoint(correctedSetPoint);
                     else
-                        if(count%5==4)
-                            FourLetterPhatManager.printPricingPeriod(currentPricingPeriod);
+                        if(count%6==4)
+                            FourLetterPhatManager.printCurrentTime();
                         else
-                            FourLetterPhatManager.printTemperature(temperature);
+                            if(count%6==5)
+                                FourLetterPhatManager.printPricingPeriod(currentPricingPeriod);
+                            else
+                                FourLetterPhatManager.printTemperature(temperature);
                     HEATER_THREAD.updateEnvironment(temperature,correctedSetPoint,HEATER_THREAD.isHeaterOn(),TEMPERATURES);
                     if(!started)
                     {

@@ -23,6 +23,10 @@ public class SetPointManager
     private static String statusMode="N/A";
     private static String dataMode="N/A";
     private static double manualSetPoint=0d;
+    private static boolean overridingSetPointEnabled=false;
+    private static double overridingSetPoint=0d;
+    private static long overridingSetPointStartTime=0L;
+    private static double overridingSetPointHours=0d;
     private static final List<Schedule> SCHEDULES=new ArrayList<>(2);
     private static final long NETATMO_VERIFICATION_DELAY=Duration.of(10).minute();
 
@@ -36,13 +40,20 @@ public class SetPointManager
         }
         try
         {
+            if(overridingSetPointEnabled)
+            {
+                if((double)(now-overridingSetPointStartTime)/3_600_000d>overridingSetPointHours)
+                    resetOverridingSetPoint();
+                else
+                    return overridingSetPoint;
+            }
             if(statusMode.equals("manual"))
                 return manualSetPoint;
             if(statusMode.equals("off"))
                 return 0d;
             if(statusMode.equals("max"))
                 return 30d;
-            Schedule activeSchedule=SCHEDULES.stream().filter(t->t.isSelected()).findFirst().orElse(SCHEDULES.get(0));
+            Schedule activeSchedule=SCHEDULES.stream().filter(Schedule::isSelected).findFirst().orElse(SCHEDULES.get(0));
             if(dataMode.equals("away"))
                 return activeSchedule.getAway_temp();
             if(dataMode.equals("frost_guard"))
@@ -256,7 +267,7 @@ public class SetPointManager
                     }
                     SCHEDULES.add(schedule);
                 }
-                Logger.LOGGER.info(SCHEDULES.size()+" schedules loaded successfully, default one is "+SCHEDULES.stream().filter(t->t.isSelected()).findFirst().orElse(SCHEDULES.get(0)).getName());
+                Logger.LOGGER.info(SCHEDULES.size()+" schedules loaded successfully, default one is "+SCHEDULES.stream().filter(Schedule::isSelected).findFirst().orElse(SCHEDULES.get(0)).getName());
             }
             catch(JsonParseException e)
             {
@@ -286,5 +297,21 @@ public class SetPointManager
         if(currentZone==null)
             currentZone=schedule.getZones().get(0);
         return currentZone.getTemperature();
+    }
+
+    public static synchronized void setOverridingSetPoint(double setPoint,double hours)
+    {
+        overridingSetPointEnabled=true;
+        overridingSetPoint=setPoint;
+        overridingSetPointStartTime=System.currentTimeMillis();
+        overridingSetPointHours=hours;
+    }
+
+    public static synchronized void resetOverridingSetPoint()
+    {
+        overridingSetPointEnabled=false;
+        overridingSetPoint=0d;
+        overridingSetPointStartTime=0L;
+        overridingSetPointHours=0d;
     }
 }

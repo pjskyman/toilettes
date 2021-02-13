@@ -1,6 +1,5 @@
 package sky.toilettes;
 
-import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.ToDoubleFunction;
@@ -114,8 +113,8 @@ public class Toilettes
 
     private static void refreshPricingPeriod()
     {
-        List<InstantaneousConsumption> instantaneousConsumptions=Database.getLastInstantaneousConsumptions(1);
-        if(instantaneousConsumptions.isEmpty())
+        InstantaneousConsumption instantaneousConsumption=Database.getLastInstantaneousConsumption();
+        if(instantaneousConsumption==null)
         {
             try
             {
@@ -124,19 +123,15 @@ public class Toilettes
             catch(InterruptedException e)
             {
             }
-            instantaneousConsumptions=Database.getLastInstantaneousConsumptions(1);
-            if(instantaneousConsumptions.isEmpty())
+            instantaneousConsumption=Database.getLastInstantaneousConsumption();
+            if(instantaneousConsumption==null)
             {
                 Logger.LOGGER.error("Unable to get the last measure");
             }
         }
         PricingPeriod oldPricingPeriod=currentPricingPeriod;
-        currentPricingPeriod=instantaneousConsumptions.get(instantaneousConsumptions.size()-1).getPricingPeriod();
-        if(currentPricingPeriod==oldPricingPeriod)
-        {
-//            Logger.LOGGER.info("The pricing period is always "+currentPricingPeriod.name());
-        }
-        else
+        currentPricingPeriod=instantaneousConsumption.getPricingPeriod();
+        if(currentPricingPeriod!=oldPricingPeriod)
             Logger.LOGGER.info("Now the pricing period is "+currentPricingPeriod.name()+" instead of "+oldPricingPeriod.name());
     }
 

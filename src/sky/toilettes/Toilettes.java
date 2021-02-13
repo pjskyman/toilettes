@@ -18,6 +18,7 @@ import java.util.function.ToDoubleFunction;
 import sky.housecommon.InstantaneousConsumption;
 import sky.housecommon.NotAvailableDatabaseException;
 import sky.housecommon.PricingPeriod;
+import sky.housecommon.Temperature;
 import sky.program.Duration;
 
 public class Toilettes

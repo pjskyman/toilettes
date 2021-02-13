@@ -14,6 +14,11 @@ public enum PricingPeriod
             return 0d;
         }
 
+        public double getPrice()
+        {
+            return 0d;
+        }
+
         @Override
         public String toString()
         {
@@ -30,6 +35,11 @@ public enum PricingPeriod
         public double getTotal(InstantaneousConsumption instantaneousConsumption)
         {
             return instantaneousConsumption.getBlueDayOffPeakHourTotal();
+        }
+
+        public double getPrice()
+        {
+            return .1247d;
         }
 
         @Override
@@ -50,6 +60,11 @@ public enum PricingPeriod
             return instantaneousConsumption.getBlueDayPeakHourTotal();
         }
 
+        public double getPrice()
+        {
+            return .1550d;
+        }
+
         @Override
         public String toString()
         {
@@ -66,6 +81,11 @@ public enum PricingPeriod
         public double getTotal(InstantaneousConsumption instantaneousConsumption)
         {
             return instantaneousConsumption.getWhiteDayOffPeakHourTotal();
+        }
+
+        public double getPrice()
+        {
+            return .1399d;
         }
 
         @Override
@@ -86,6 +106,11 @@ public enum PricingPeriod
             return instantaneousConsumption.getWhiteDayPeakHourTotal();
         }
 
+        public double getPrice()
+        {
+            return .1759d;
+        }
+
         @Override
         public String toString()
         {
@@ -104,6 +129,11 @@ public enum PricingPeriod
             return instantaneousConsumption.getRedDayOffPeakHourTotal();
         }
 
+        public double getPrice()
+        {
+            return .1492d;
+        }
+
         @Override
         public String toString()
         {
@@ -120,6 +150,11 @@ public enum PricingPeriod
         public double getTotal(InstantaneousConsumption instantaneousConsumption)
         {
             return instantaneousConsumption.getRedDayPeakHourTotal();
+        }
+
+        public double getPrice()
+        {
+            return .6391d;
         }
 
         @Override
@@ -158,6 +193,8 @@ public enum PricingPeriod
     public abstract int getCode();
 
     public abstract double getTotal(InstantaneousConsumption instantaneousConsumption);
+
+    public abstract double getPrice();
 
     public static PricingPeriod getPricingPeriodForCode(int code)
     {

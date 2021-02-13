@@ -1,5 +1,7 @@
 package sky.toilettes;
 
+import sky.housecommon.PricingPeriod;
+
 public class InstantaneousConsumption
 {
     private final long time;

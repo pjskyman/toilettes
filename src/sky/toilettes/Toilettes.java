@@ -15,6 +15,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.ToDoubleFunction;
+import sky.housecommon.PricingPeriod;
 import sky.program.Duration;
 
 public class Toilettes

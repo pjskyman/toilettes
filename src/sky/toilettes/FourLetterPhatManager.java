@@ -6,6 +6,7 @@ import java.text.DecimalFormat;
 import java.text.NumberFormat;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
+import sky.housecommon.PricingPeriod;
 
 public class FourLetterPhatManager extends AbstractI2CManager
 {

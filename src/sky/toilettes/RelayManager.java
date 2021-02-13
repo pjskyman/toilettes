@@ -6,6 +6,7 @@ import com.pi4j.io.gpio.PinPullResistance;
 import com.pi4j.io.gpio.PinState;
 import com.pi4j.io.gpio.RaspiPin;
 import com.pi4j.io.gpio.impl.GpioControllerImpl;
+import sky.housecommon.Logger;
 import sky.program.Duration;
 
 public class RelayManager

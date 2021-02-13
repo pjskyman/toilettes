@@ -11,6 +11,7 @@ import java.util.ArrayList;
 import java.util.Calendar;
 import java.util.GregorianCalendar;
 import java.util.List;
+import sky.housecommon.Logger;
 import sky.netatmo.NetatmoException;
 import sky.netatmo.Token;
 import sky.netatmo.TokenExpiredException;

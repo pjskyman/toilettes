@@ -1,6 +1,7 @@
 package sky.toilettes;
 
 import java.util.Queue;
+import sky.housecommon.Logger;
 import sky.housecommon.Temperature;
 import sky.program.Duration;
 

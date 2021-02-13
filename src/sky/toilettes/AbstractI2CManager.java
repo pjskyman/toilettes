@@ -4,6 +4,7 @@ import com.pi4j.io.i2c.I2CBus;
 import com.pi4j.io.i2c.I2CFactory;
 import com.pi4j.io.i2c.I2CFactory.UnsupportedBusNumberException;
 import java.io.IOException;
+import sky.housecommon.Logger;
 
 public abstract class AbstractI2CManager
 {

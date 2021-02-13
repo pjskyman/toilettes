@@ -7,6 +7,7 @@ import java.io.PrintWriter;
 import java.net.Socket;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+import sky.housecommon.Logger;
 
 public class ExternalControllerClient implements Runnable
 {

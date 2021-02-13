@@ -2,6 +2,7 @@ package sky.toilettes;
 
 import com.pi4j.io.i2c.I2CDevice;
 import java.io.IOException;
+import sky.housecommon.Logger;
 
 public class ThermometerManager extends AbstractI2CManager
 {

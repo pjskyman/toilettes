@@ -4,11 +4,11 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.ToDoubleFunction;
+import sky.housecommon.Database;
 import sky.housecommon.InstantaneousConsumption;
 import sky.housecommon.Logger;
 import sky.housecommon.NotAvailableDatabaseException;
 import sky.housecommon.PricingPeriod;
-import sky.housecommon.Requestor;
 import sky.housecommon.Temperature;
 import sky.program.Duration;
 
@@ -114,7 +114,7 @@ public class Toilettes
 
     private static void refreshPricingPeriod()
     {
-        List<InstantaneousConsumption> instantaneousConsumptions=Requestor.getLastInstantaneousConsumptions(1);
+        List<InstantaneousConsumption> instantaneousConsumptions=Database.getLastInstantaneousConsumptions(1);
         if(instantaneousConsumptions.isEmpty())
         {
             try
@@ -124,7 +124,7 @@ public class Toilettes
             catch(InterruptedException e)
             {
             }
-            instantaneousConsumptions=Requestor.getLastInstantaneousConsumptions(1);
+            instantaneousConsumptions=Database.getLastInstantaneousConsumptions(1);
             if(instantaneousConsumptions.isEmpty())
             {
                 Logger.LOGGER.error("Unable to get the last measure");
@@ -185,7 +185,7 @@ public class Toilettes
         {
             try
             {
-                return Requestor.insertTemperature(temperature);
+                return Database.insertTemperature(temperature);
             }
             catch(NotAvailableDatabaseException e)
             {

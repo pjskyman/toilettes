@@ -16,6 +16,7 @@ import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.ToDoubleFunction;
 import sky.housecommon.InstantaneousConsumption;
+import sky.housecommon.NotAvailableDatabaseException;
 import sky.housecommon.PricingPeriod;
 import sky.program.Duration;
 

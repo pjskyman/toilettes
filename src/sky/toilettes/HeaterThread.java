@@ -9,9 +9,12 @@ public class HeaterThread extends Thread
     private double currentRatio;
     private boolean currentStatus;
     private boolean cycleInterrupted;
+    private long lastTimeCycleInterrupted;
+    private boolean overridingOff;
     private static long lastMeasureTime=0L;
     private static final long CYCLE_TIME=Duration.of(10).minute();
     private static final long MINIMAL_STATE_TIME=Duration.of(10).second();
+    private static final long MINIMAL_CYCLE_INTERRUPTION_DELAY=Duration.of(2).minute();
     private static final Object LOCK_OBJECT=new Object();
     private static final double FULL_RATIO_TEMPERATURE_OFFSET=-.5d;
 
@@ -19,6 +22,8 @@ public class HeaterThread extends Thread
     {
         nextRatio=currentRatio=0d;
         currentStatus=cycleInterrupted=false;
+        lastTimeCycleInterrupted=0L;
+        overridingOff=false;
     }
 
     public void updateEnvironment(double temperature,double setPoint,boolean heaterOn,Queue<Temperature> temperatureQueue)
@@ -41,17 +46,40 @@ public class HeaterThread extends Thread
         {
             if(cycleInterrupted)
                 return;
-            if(ratio<=currentRatio-.5d&&currentStatus)
+            if(currentStatus&&overridingOff)
+            {
                 cycleInterrupted=true;
+                lastTimeCycleInterrupted=now;
+            }
             else
-                if(nextRatio>=currentRatio+.5d&&!currentStatus)
-                    cycleInterrupted=true;
+                if(ratio<=currentRatio-.5d&&currentStatus)
+                {
+                    if(now-lastTimeCycleInterrupted>MINIMAL_CYCLE_INTERRUPTION_DELAY)
+                    {
+                        cycleInterrupted=true;
+                        lastTimeCycleInterrupted=now;
+                    }
+                }
+                else
+                    if(nextRatio>=currentRatio+.5d&&!currentStatus)
+                    {
+                        if(now-lastTimeCycleInterrupted>MINIMAL_CYCLE_INTERRUPTION_DELAY)
+                        {
+                            cycleInterrupted=true;
+                            lastTimeCycleInterrupted=now;
+                        }
+                    }
         }
     }
 
     public boolean isHeaterOn()
     {
         return currentStatus;
+    }
+
+    public void setOverridingOff(boolean off)
+    {
+        overridingOff=off;
     }
 
     @Override
@@ -66,6 +94,8 @@ public class HeaterThread extends Thread
                 long timeToHeat=(long)((double)CYCLE_TIME*currentRatio);
                 timeToHeat=timeToHeat<=0L?0L:Math.max(timeToHeat,MINIMAL_STATE_TIME);
                 timeToHeat=timeToHeat>=CYCLE_TIME?CYCLE_TIME:Math.min(timeToHeat,CYCLE_TIME-MINIMAL_STATE_TIME);
+                if(overridingOff)
+                    timeToHeat=0L;
                 Logger.LOGGER.info("Beginning a new cycle with "+timeToHeat/1000L+" s of heating");
                 if(timeToHeat==0L)
                 {

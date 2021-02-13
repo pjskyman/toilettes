@@ -11,11 +11,10 @@ import java.sql.SQLException;
 import java.sql.Statement;
 import java.util.ArrayList;
 import java.util.Collections;
-import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
+import java.util.function.ToDoubleFunction;
 import sky.program.Duration;
 
 public class Toilettes
@@ -24,7 +23,14 @@ public class Toilettes
     private static PricingPeriod currentPricingPeriod=PricingPeriod.UNKNOWN;
     private static final long PRICING_PERIOD_VERIFICATION_DELAY=Duration.of(5).second();
     protected static final HeaterThread HEATER_THREAD=new HeaterThread();//protected pour accès dans FourLetterPhatManager
-    private static final Map<PricingPeriod,Double> SETPOINT_OFFSETS;
+    private static final ToDoubleFunction<PricingPeriod> SETPOINT_OFFSET_PROVIDER=pricingPeriod->
+    {
+        if(pricingPeriod==PricingPeriod.UNKNOWN)
+            return -10d;
+        if(pricingPeriod==PricingPeriod.RED_DAY_PEAK_HOUR)
+            return -5d;
+        return -(pricingPeriod.getPrice()-PricingPeriod.BLUE_DAY_OFF_PEAK_HOUR.getPrice())*35.25d;
+    };
     private static final Queue<Temperature> TEMPERATURES;
     private static final DatabasePopulator DATABASE_POPULATOR;
 
@@ -33,18 +39,36 @@ public class Toilettes
         TEMPERATURES=new ConcurrentLinkedQueue<>();
         DATABASE_POPULATOR=new DatabasePopulator();
         DATABASE_POPULATOR.start();
-        SETPOINT_OFFSETS=new HashMap<>();
-        SETPOINT_OFFSETS.put(PricingPeriod.BLUE_DAY_OFF_PEAK_HOUR,Double.valueOf(0d));
-        SETPOINT_OFFSETS.put(PricingPeriod.BLUE_DAY_PEAK_HOUR,Double.valueOf(-.7930d));
-        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_OFF_PEAK_HOUR,Double.valueOf(-.5322d));
-        SETPOINT_OFFSETS.put(PricingPeriod.WHITE_DAY_PEAK_HOUR,Double.valueOf(-1.5876d));
-        SETPOINT_OFFSETS.put(PricingPeriod.RED_DAY_OFF_PEAK_HOUR,Double.valueOf(-.7718d));
-        SETPOINT_OFFSETS.put(PricingPeriod.RED_DAY_PEAK_HOUR,Double.valueOf(-5d));
-        SETPOINT_OFFSETS.put(PricingPeriod.UNKNOWN,Double.valueOf(-10d));
     }
 
     public static void main(String[] args)
     {
+        new ExternalController(new ExternallyControlled()
+        {
+            public void on()
+            {
+                Logger.LOGGER.info("External controller said on");
+                HEATER_THREAD.setOverridingOff(false);
+            }
+
+            public void off()
+            {
+                Logger.LOGGER.info("External controller said off");
+                HEATER_THREAD.setOverridingOff(true);
+            }
+
+            public void set(double setPoint,double hours)
+            {
+                Logger.LOGGER.info("External controller said set "+setPoint+" "+hours);
+                SetPointManager.setOverridingSetPoint(setPoint,hours);
+            }
+
+            public void reset()
+            {
+                Logger.LOGGER.info("External controller said reset");
+                SetPointManager.resetOverridingSetPoint();
+            }
+        });
         boolean started=false;
         try
         {
@@ -59,7 +83,7 @@ public class Toilettes
                         lastPricingPeriodVerificationTime=now;
                     }
                     double temperature=ThermometerManager.getTemperature();
-                    double correctedSetPoint=Math.max(0d,SetPointManager.getCurrentSetPoint()+SETPOINT_OFFSETS.get(currentPricingPeriod).doubleValue());
+                    double correctedSetPoint=Math.max(0d,SetPointManager.getCurrentSetPoint()+SETPOINT_OFFSET_PROVIDER.applyAsDouble(currentPricingPeriod));
                     if(++count%6==3)
                         FourLetterPhatManager.printSetPoint(correctedSetPoint);
                     else

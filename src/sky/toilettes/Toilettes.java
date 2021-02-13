@@ -1,11 +1,6 @@
 package sky.toilettes;
 
-import java.io.BufferedReader;
-import java.io.File;
-import java.io.FileReader;
-import java.io.IOException;
 import java.sql.Connection;
-import java.sql.DriverManager;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
@@ -15,6 +10,7 @@ import java.util.List;
 import java.util.Queue;
 import java.util.concurrent.ConcurrentLinkedQueue;
 import java.util.function.ToDoubleFunction;
+import sky.housecommon.Database;
 import sky.housecommon.InstantaneousConsumption;
 import sky.housecommon.Logger;
 import sky.housecommon.NotAvailableDatabaseException;
@@ -154,7 +150,7 @@ public class Toilettes
     {
         try
         {
-            try(Connection connection=getConnection1())
+            try(Connection connection=Database.getEcocompteurConnection())
             {
                 long startTime=System.currentTimeMillis();
                 List<InstantaneousConsumption> instantaneousConsumptions=new ArrayList<>();
@@ -235,50 +231,10 @@ public class Toilettes
         }
     }
 
-    private static Connection getConnection1() throws NotAvailableDatabaseException
-    {
-        String serverAddress="";
-        String serverPort="";
-        String databaseName="";
-        String user="";
-        String password="";
-        try(BufferedReader reader=new BufferedReader(new FileReader(new File("database1.ini"))))
-        {
-            serverAddress=reader.readLine();
-            serverPort=reader.readLine();
-            databaseName=reader.readLine();
-            user=reader.readLine();
-            password=reader.readLine();
-        }
-        catch(IOException e)
-        {
-            Logger.LOGGER.error("Unable to read database connection infos 1 from the config file ("+e.toString()+")");
-        }
-        Connection connection=null;
-        try
-        {
-            connection=DriverManager.getConnection("jdbc:mariadb://"+serverAddress+":"+serverPort+"/"+databaseName+"?user="+user+"&password="+password);
-//            Logger.LOGGER.info("Connection to SQLite has been established.");
-        }
-        catch(SQLException e)
-        {
-            try
-            {
-                if(connection!=null)
-                    connection.close();
-            }
-            catch(SQLException ex)
-            {
-            }
-            Logger.LOGGER.error(e.toString());
-        }
-        return connection;
-    }
-
     private static boolean insertIntoDatabase(Temperature temperature) throws NotAvailableDatabaseException
     {
         boolean success=false;
-        try(Connection connection=getConnection2())
+        try(Connection connection=Database.getToilettesConnection())
         {
             try(Statement statement=connection.createStatement(ResultSet.TYPE_FORWARD_ONLY,ResultSet.CONCUR_READ_ONLY))
             {
@@ -298,46 +254,6 @@ public class Toilettes
             throw new NotAvailableDatabaseException(ex);
         }
         return success;
-    }
-
-    private static Connection getConnection2() throws NotAvailableDatabaseException
-    {
-        String serverAddress="";
-        String serverPort="";
-        String databaseName="";
-        String user="";
-        String password="";
-        try(BufferedReader reader=new BufferedReader(new FileReader(new File("database2.ini"))))
-        {
-            serverAddress=reader.readLine();
-            serverPort=reader.readLine();
-            databaseName=reader.readLine();
-            user=reader.readLine();
-            password=reader.readLine();
-        }
-        catch(IOException e)
-        {
-            Logger.LOGGER.error("Unable to read database connection infos 2 from the config file ("+e.toString()+")");
-        }
-        Connection connection=null;
-        try
-        {
-            connection=DriverManager.getConnection("jdbc:mariadb://"+serverAddress+":"+serverPort+"/"+databaseName+"?user="+user+"&password="+password);
-//            Logger.LOGGER.info("Connection to SQLite has been established.");
-        }
-        catch(SQLException e)
-        {
-            try
-            {
-                if(connection!=null)
-                    connection.close();
-            }
-            catch(SQLException ex)
-            {
-            }
-            Logger.LOGGER.error(e.toString());
-        }
-        return connection;
     }
 
     private static class DatabasePopulator extends Thread

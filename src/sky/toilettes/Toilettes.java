@@ -130,7 +130,7 @@ public class Toilettes
             }
         }
         PricingPeriod oldPricingPeriod=currentPricingPeriod;
-        currentPricingPeriod=instantaneousConsumption.getPricingPeriod();
+        currentPricingPeriod=instantaneousConsumption!=null?instantaneousConsumption.getPricingPeriod():PricingPeriod.UNKNOWN;
         if(currentPricingPeriod!=oldPricingPeriod)
             Logger.LOGGER.info("Now the pricing period is "+currentPricingPeriod.name()+" instead of "+oldPricingPeriod.name());
     }
